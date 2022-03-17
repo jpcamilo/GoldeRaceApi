@@ -1,8 +1,11 @@
 package com.goldenrace.api.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +43,29 @@ public class TicketController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
+	//Busqueda entre fechas
+	@GetMapping("/ticket/{dBegin}/{dEnd}")
+	public ResponseEntity<List<TicketModel>> getTicketByDate(@PathVariable("dBegin") String dBegin, @PathVariable("dEnd") String dEnd ) {
+		SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+		Date dBeginFormateada;
+		Date dEndFormateada;
+		try {
+			dBeginFormateada = formato.parse(dBegin);
+			dEndFormateada = formato.parse(dEnd);
+			List<TicketModel> ticketData = ticketRepository.findByCreation_Date(dBeginFormateada,dEndFormateada);
+			if (ticketData.isEmpty()) {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			} else {
+				return new ResponseEntity<>(ticketData, HttpStatus.OK);			
+			}
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+
+	}
+	
 	@PostMapping("/ticket")
 	public ResponseEntity<TicketModel> createTutorial(@RequestBody TicketModel ticket) {
 		try {
@@ -50,6 +76,7 @@ public class TicketController {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
 	@PutMapping("/ticket/{id}")
 	public ResponseEntity<TicketModel> updateTicket(@PathVariable("id") long id, @RequestBody TicketModel ticket) {
 		Optional<TicketModel> ticketData = ticketRepository.findById(id);
@@ -64,6 +91,7 @@ public class TicketController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
+	
 	@DeleteMapping("/ticket/{id}")
 	public ResponseEntity<HttpStatus> deleteTutorial(@PathVariable("id") long id) {
 		try {
