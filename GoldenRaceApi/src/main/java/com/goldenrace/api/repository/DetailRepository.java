@@ -17,6 +17,5 @@ public interface DetailRepository extends JpaRepository<DetailModel, Long> {
 	
 	@Transactional
 	void deleteByTicketModelId(Long ticketId);
-
-
+	
 }

@@ -65,10 +65,10 @@ public class DetailController {
 	@PutMapping("/details/{id}")
 	public ResponseEntity<DetailModel> updateDetail(@PathVariable("id") long id, @RequestBody DetailModel detailRequest) {
 		DetailModel detail = detailRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("CommentId " + id + "not found"));
+				.orElseThrow(() -> new ResourceNotFoundException("detailId " + id + "not found"));
 
 		detail.setAmount(detailRequest.getAmount());
-		detail.setDescription(detail.getDescription());
+		detail.setDescription(detailRequest.getDescription());
 		
 		return new ResponseEntity<>(detailRepository.save(detail), HttpStatus.OK);
 	}
@@ -88,6 +88,7 @@ public class DetailController {
 		}
 
 		detailRepository.deleteByTicketModelId(ticketId);
+		ticketRepository.deleteById(ticketId);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
