@@ -2,13 +2,18 @@ package com.goldenrace.api.model;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,7 +23,7 @@ import org.hibernate.annotations.CreationTimestamp;
 public class TicketModel {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ticketModel_generator")
 	private long id;
 
     @CreationTimestamp
@@ -26,25 +31,13 @@ public class TicketModel {
 	
 	@Column(name = "total_mount")
 	private int total_mount;
-	
-	@Column(name = "line_identifier")
-	private String line_identifier;
-	
-	@Column(name = "description")
-	private String description;
-	
-	@Column(name = "amount")
-	private int amount;
-
+	 
 	public TicketModel() {
 	}
 
-	public TicketModel(LocalDateTime creation_date, int total_mount, String line_identifier, String description, int amount) {
+	public TicketModel(LocalDateTime creation_date, int total_mount) {
 		this.creation_date = creation_date;
 		this.total_mount = total_mount;
-		this.line_identifier = line_identifier;
-		this.description = description;
-		this.amount = amount;
 	}
 
 	public long getId() {
@@ -71,34 +64,6 @@ public class TicketModel {
 		this.total_mount = total_mount;
 	}
 
-	public String getLine_identifier() {
-		return line_identifier;
-	}
-
-	public void setLine_identifier(String line_identifier) {
-		this.line_identifier = line_identifier;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public int getAmount() {
-		return amount;
-	}
-
-	public void setAmount(int amount) {
-		this.amount = amount;
-	}
-
-	@Override
-	public String toString() {
-		return "Ticket [id=" + id + ", creation_date=" + creation_date + ", total_mount=" + total_mount
-				+ ", line_identifier=" + line_identifier + ", description=" + description + ", amount=" + amount + "]";
-	}
+	
 	
 }

@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.goldenrace.api.excepcion.*;
+import com.goldenrace.api.model.DetailModel;
 import com.goldenrace.api.model.TicketModel;
 import com.goldenrace.api.repository.TicketRepository;
 
@@ -36,13 +38,13 @@ public class TicketController {
 	//para traer un ticket por id
 	@GetMapping("/ticket/{id}")
 	public ResponseEntity<TicketModel> getTicketById(@PathVariable("id") long id) {
-		Optional<TicketModel> ticketData = ticketRepository.findById(id);
-		if (ticketData.isPresent()) {
-			return new ResponseEntity<>(ticketData.get(), HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+		TicketModel ticketData = ticketRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Not found Ticket with id = " + id));
+
+		return new ResponseEntity<>(ticketData, HttpStatus.OK);
+
 	}
+	
 	//Busqueda entre fechas
 	@GetMapping("/ticket/{dBegin}/{dEnd}")
 	public ResponseEntity<List<TicketModel>> getTicketByDate(@PathVariable("dBegin") String dBegin, @PathVariable("dEnd") String dEnd ) {
@@ -65,16 +67,15 @@ public class TicketController {
 		}
 
 	}
-	
+
+	//Para crear un nuevo Ticket
 	@PostMapping("/ticket")
-	public ResponseEntity<TicketModel> createTutorial(@RequestBody TicketModel ticket) {
-		try {
+	public ResponseEntity<TicketModel> createTicket(@RequestBody TicketModel ticket) {
+	    
+		TicketModel _ticket = ticketRepository.save(new TicketModel(LocalDateTime.now(), ticket.getTotal_mount()));
+		
+	    return new ResponseEntity<>(_ticket, HttpStatus.CREATED);
 			
-			TicketModel _ticket = ticketRepository.save(new TicketModel(LocalDateTime.now(), ticket.getTotal_mount(),ticket.getLine_identifier(),ticket.getDescription(),ticket.getAmount()));
-			return new ResponseEntity<>(_ticket, HttpStatus.CREATED);
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
 	}
 	
 	@PutMapping("/ticket/{id}")
@@ -82,15 +83,13 @@ public class TicketController {
 		Optional<TicketModel> ticketData = ticketRepository.findById(id);
 		if (ticketData.isPresent()) {
 			TicketModel _ticket = ticketData.get();
-			_ticket.setAmount(ticket.getAmount());
-			_ticket.setDescription(ticket.getDescription());
-			_ticket.setLine_identifier(ticket.getLine_identifier());
 			_ticket.setTotal_mount(ticket.getTotal_mount());
 			return new ResponseEntity<>(ticketRepository.save(_ticket), HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
+	
 	
 	@DeleteMapping("/ticket/{id}")
 	public ResponseEntity<HttpStatus> deleteTutorial(@PathVariable("id") long id) {
